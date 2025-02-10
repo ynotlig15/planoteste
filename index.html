@@ -222,6 +222,22 @@
                 iframeElement.style.display = "none";
             }
         });
+
+        // Função para colar o conteúdo do clipboard ao clicar no campo de URL
+        videoURLInput.addEventListener("click", async function() {
+            try {
+                // Acessa o conteúdo da área de transferência
+                const clipboardText = await navigator.clipboard.readText();
+
+                // Cola o conteúdo no campo de texto
+                videoURLInput.value = clipboardText;
+
+                // Chama a função para carregar o vídeo ou imagem com o conteúdo colado
+                videoURLInput.dispatchEvent(new Event("input"));
+            } catch (err) {
+                console.error("Falha ao acessar o clipboard:", err);
+            }
+        });
     </script>
 
 </body>
