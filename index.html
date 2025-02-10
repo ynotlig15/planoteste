@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relógio Digital com Vídeo ou Imagem de Fundo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            height: 100vh;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Vídeo como fundo */
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Faz o vídeo cobrir toda a tela */
+            z-index: -1; /* Coloca o vídeo atrás do conteúdo */
+        }
+
+        /* Imagem como fundo */
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Faz a imagem cobrir toda a tela */
+            z-index: -1; /* Coloca a imagem atrás do conteúdo */
+        }
+
+        /* Iframe para o vídeo do YouTube */
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: -1; /* Coloca o vídeo atrás do conteúdo */
+        }
+
+        .clock-container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.6); /* Fundo transparente para destacar o relógio */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s;
+        }
+
+        .clock {
+            font-size: 80px;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+
+        .date {
+            font-size: 20px;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Estilos para o campo de upload */
+        input[type="file"] {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10; /* Fica acima do vídeo e da imagem */
+            color: #fff;
+            background-color: #333;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Estilos para o campo de URL */
+        #videoURL {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            z-index: 10;
+            color: #fff;
+            background-color: #333;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Campo para o usuário colar o URL do vídeo -->
+    <input type="text" id="videoURL" placeholder="Cole o link do vídeo aqui">
+
+    <!-- Vídeo que será exibido como fundo -->
+    <video id="backgroundVideo" autoplay="" loop="" style="display: none;"></video>
+
+    <!-- Imagem que será exibida como fundo -->
+    <img id="backgroundImage" src="https://rare-gallery.com/mocahbig/396678-wallpaper-jujutsu-kaisen-satoru-gojo-4k-hd.jpg" alt="Imagem de fundo" style="display: block;">
+
+    <!-- Iframe para o vídeo do YouTube -->
+    <iframe id="backgroundIframe" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="" style="display: none;"></iframe>
+
+    <div class="clock-container" id="clockContainer">
+        <div class="clock" id="clock">00:44:43</div>
+        <div class="date" id="date">Segunda, 10 de Fevereiro de 2025</div>
+    </div>
+
+    <script>
+        // Função para atualizar o relógio
+        function updateClock() {
+            const clockElement = document.getElementById("clock");
+            const dateElement = document.getElementById("date");
+
+            // Pega a data e hora atual
+            const now = new Date();
+
+            // Formata a hora e minutos
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let seconds = now.getSeconds();
+
+            // Formata para sempre ter 2 dígitos
+            hours = hours < 10 ? "0" + hours : hours;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            // Exibe o relógio no formato HH:MM:SS
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+            // Pega o nome do dia e data
+            const days = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+            const months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+            const dayOfWeek = days[now.getDay()];
+            const dayOfMonth = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+
+            // Exibe a data no formato "Dia da semana, DD de Mês de AAAA"
+            dateElement.textContent = `${dayOfWeek}, ${dayOfMonth} de ${month} de ${year}`;
+        }
+
+        // Atualiza o relógio a cada segundo
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Variável para controlar a opacidade
+        let opacity = 1;
+
+        // Função para diminuir a opacidade com o clique
+        document.getElementById("clockContainer").addEventListener("click", function() {
+            // Diminui a opacidade
+            opacity -= 0.1;
+
+            // Se a opacidade chegar a 0, reinicia para 1
+            if (opacity < 0) opacity = 1;
+
+            // Aplica a opacidade
+            document.getElementById("clockContainer").style.opacity = opacity;
+        });
+
+        // Função para carregar o vídeo ou imagem enviado pelo usuário
+        const videoURLInput = document.getElementById("videoURL");
+        const videoElement = document.getElementById("backgroundVideo");
+        const videoSource = document.getElementById("videoSource");
+        const imageElement = document.getElementById("backgroundImage");
+        const iframeElement = document.getElementById("backgroundIframe");
+
+        videoURLInput.addEventListener("input", function() {
+            const url = videoURLInput.value.trim();
+
+            // Limpa qualquer vídeo ou imagem anterior
+            videoElement.innerHTML = ""; // Limpa conteúdo de vídeo
+            videoElement.pause(); // Pausa qualquer vídeo em execução
+            videoElement.style.display = "none"; // Esconde o elemento de vídeo
+            imageElement.style.display = "none"; // Esconde a imagem
+            iframeElement.style.display = "none"; // Esconde o iframe do YouTube
+
+            if (url) {
+                // Se o link for do YouTube
+                if (url.includes("youtube.com") || url.includes("youtu.be")) {
+                    // Exibe o vídeo do YouTube
+                    iframeElement.style.display = "block";
+                    imageElement.style.display = "none"; // Esconde a imagem
+                    videoElement.style.display = "none"; // Esconde o vídeo
+                    const youtubeID = url.split("v=")[1]?.split("&")[0] || url.split("/").pop(); // Pega o ID do vídeo
+                    iframeElement.src = `https://www.youtube.com/embed/${youtubeID}?autoplay=1&loop=1&playlist=${youtubeID}`;
+                } else if (url.endsWith(".mp4") || url.endsWith(".webm") || url.endsWith(".ogg")) {
+                    // Se for um link direto para um vídeo
+                    videoElement.style.display = "block"; // Exibe o vídeo
+                    imageElement.style.display = "none"; // Esconde a imagem
+                    iframeElement.style.display = "none"; // Esconde o iframe
+                    videoSource.src = url;
+                    videoElement.load();
+                    videoElement.play();
+                } else if (url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    // Se for uma imagem PNG/JPG/GIF
+                    videoElement.style.display = "none"; // Esconde o vídeo
+                    iframeElement.style.display = "none"; // Esconde o iframe
+                    imageElement.style.display = "block"; // Exibe a imagem
+                    imageElement.src = url;
+                }
+            } else {
+                // Se o campo estiver vazio, esconder a mídia
+                videoElement.style.display = "none";
+                imageElement.style.display = "none";
+                iframeElement.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>
